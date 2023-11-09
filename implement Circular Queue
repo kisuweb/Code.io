@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 5
+
+// Define a structure for the circular queue
+struct CircularQueue {
+    int data[MAX_SIZE];
+    int front; // Index of the front element
+    int rear;  // Index of the rear element
+    int size;  // Current size of the queue
+};
+
+// Initialize the circular queue
+void initialize(struct CircularQueue* queue) {
+    queue->front = 0; // Initialize the front to 0
+    queue->rear = -1; // Initialize the rear to -1
+    queue->size = 0;  // Initialize the size to 0
+}
+
+// Enqueue (push) an element into the circular queue
+int enqueue(struct CircularQueue* queue, int value) {
+    if (queue->size == MAX_SIZE) {
+        printf("Queue is full. Cannot enqueue %d.\n", value);
+        return 0; // Enqueue operation failed
+    } else {
+        queue->rear = (queue->rear + 1) % MAX_SIZE;
+        queue->data[queue->rear] = value;
+        queue->size++;
+        return 1; // Enqueue operation succeeded
+    }
+}
+
+// Dequeue (pop) an element from the circular queue
+int dequeue(struct CircularQueue* queue) {
+    if (queue->size == 0) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        return -1; // Queue is empty
+    } else {
+        int dequeuedValue = queue->data[queue->front];
+        queue->front = (queue->front + 1) % MAX_SIZE;
+        queue->size--;
+        return dequeuedValue;
+    }
+}
+
+// Check if the circular queue is empty
+int isEmpty(struct CircularQueue* queue) {
+    return queue->size == 0;
+}
+
+// Check if the circular queue is full
+int isFull(struct CircularQueue* queue) {
+    return queue->size == MAX_SIZE;
+}
+
+int main() {
+    struct CircularQueue queue;
+    initialize(&queue);
+
+    enqueue(&queue, 1);
+    enqueue(&queue, 2);
+    enqueue(&queue, 3);
+
+    printf("Dequeue: %d\n", dequeue(&queue));
+    printf("Dequeue: %d\n", dequeue(&queue));
+    printf("Dequeue: %d\n", dequeue(&queue));
+
+    printf("Is queue empty? %s\n", isEmpty(&queue) ? "Yes" : "No");
+    printf("Is queue full? %s\n", isFull(&queue) ? "Yes" : "No");
+
+    return 0;
+}
