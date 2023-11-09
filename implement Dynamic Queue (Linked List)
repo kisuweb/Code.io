@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the queue
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Define a structure for the dynamic queue
+struct DynamicQueue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Initialize the dynamic queue
+void initialize(struct DynamicQueue* queue) {
+    queue->front = queue->rear = NULL;
+}
+
+// Enqueue (push) an element into the queue
+void enqueue(struct DynamicQueue* queue, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed. Cannot enqueue %d.\n", value);
+        return;
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (queue->rear == NULL) {
+        // If the queue is empty
+        queue->front = queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+}
+
+// Dequeue (pop) an element from the queue
+int dequeue(struct DynamicQueue* queue) {
+    if (queue->front == NULL) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        return -1; // Queue is empty
+    }
+
+    int dequeuedValue = queue->front->data;
+    struct Node* temp = queue->front;
+
+    if (queue->front == queue->rear) {
+        // If this is the last element in the queue
+        queue->front = queue->rear = NULL;
+    } else {
+        queue->front = queue->front->next;
+    }
+
+    free(temp);
+    return dequeuedValue;
+}
+
+// Check if the queue is empty
+int isEmpty(struct DynamicQueue* queue) {
+    return queue->front == NULL;
+}
+
+int main() {
+    struct DynamicQueue queue;
+    initialize(&queue);
+
+    enqueue(&queue, 1);
+    enqueue(&queue, 2);
+    enqueue(&queue, 3);
+
+    printf("Dequeue: %d\n", dequeue(&queue));
+    printf("Dequeue: %d\n", dequeue(&queue));
+    printf("Dequeue: %d\n", dequeue(&queue));
+
+    printf("Is queue empty? %s\n", isEmpty(&queue) ? "Yes" : "No");
+
+    return 0;
+}
