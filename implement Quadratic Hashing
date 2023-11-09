@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the size of the hash table
+#define TABLE_SIZE 11
+
+// Structure for representing a hash table entry
+struct HashEntry {
+    int key;
+    int value;
+    int occupied;
+};
+
+// Structure for a hash table
+struct HashTable {
+    struct HashEntry* table;
+    int size;
+};
+
+// Function to create and initialize a new hash table
+struct HashTable* createHashTable() {
+    struct HashTable* hashTable = (struct HashTable*)malloc(sizeof(struct HashTable));
+    hashTable->table = (struct HashEntry*)malloc(sizeof(struct HashEntry) * TABLE_SIZE);
+    hashTable->size = TABLE_SIZE;
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable->table[i].occupied = 0;
+    }
+
+    return hashTable;
+}
+
+// Function to compute the quadratic probe position
+int quadraticProbe(int index, int attempt, int size) {
+    return (index + attempt * attempt) % size;
+}
+
+// Function to insert a key-value pair into the hash table
+void insert(struct HashTable* hashTable, int key, int value) {
+    int index = key % hashTable->size;
+    int attempt = 0;
+
+    while (hashTable->table[index].occupied) {
+        attempt++;
+        index = quadraticProbe(key % hashTable->size, attempt, hashTable->size);
+    }
+
+    hashTable->table[index].key = key;
+    hashTable->table[index].value = value;
+    hashTable->table[index].occupied = 1;
+}
+
+// Function to search for a key and return its corresponding value
+int search(struct HashTable* hashTable, int key) {
+    int index = key % hashTable->size;
+    int attempt = 0;
+
+    while (hashTable->table[index].occupied) {
+        if (hashTable->table[index].key == key) {
+            return hashTable->table[index].value;
+        }
+        attempt++;
+        index = quadraticProbe(key % hashTable->size, attempt, hashTable->size);
+    }
+
+    return -1;  // Key not found
+}
+
+// Function to display the hash table
+void displayHashTable(struct HashTable* hashTable) {
+    for (int i = 0; i < hashTable->size; i++) {
+        if (hashTable->table[i].occupied) {
+            printf("Bucket %d: (%d, %d)\n", i, hashTable->table[i].key, hashTable->table[i].value);
+        }
+    }
+}
+
+int main() {
+    struct HashTable* hashTable = createHashTable();
+
+    insert(hashTable, 5, 25);
+    insert(hashTable, 15, 225);
+    insert(hashTable, 25, 625);
+    insert(hashTable, 7, 49);
+    insert(hashTable, 35, 1225);
+
+    printf("Hash Table:\n");
+    displayHashTable(hashTable);
+
+    printf("Search for key 15: Value = %d\n", search(hashTable, 15));
+    printf("Search for key 10: Value = %d\n", search(hashTable, 10));
+
+    free(hashTable->table);
+    free(hashTable);
+    return 0;
+}
