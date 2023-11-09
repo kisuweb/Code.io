@@ -1,0 +1,49 @@
+#include <stdio.h>
+
+// Function to calculate the factorial of a number using recursion
+unsigned long long factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+
+// Function to generate the Fibonacci series using recursion
+unsigned long long fibonacci(int n) {
+    if (n <= 0) {
+        return 0;
+    } else if (n == 1) {
+        return 1;
+    } else {
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+
+int main() {
+    int num;
+    printf("Enter a number to calculate its factorial: ");
+    scanf("%d", &num);
+
+    if (num < 0) {
+        printf("Factorial is not defined for negative numbers.\n");
+    } else {
+        unsigned long long fact = factorial(num);
+        printf("Factorial of %d is %llu\n", num, fact);
+    }
+
+    printf("Enter the number of terms for the Fibonacci series: ");
+    scanf("%d", &num);
+
+    if (num < 0) {
+        printf("Fibonacci series is not defined for negative terms.\n");
+    } else {
+        printf("Fibonacci Series for %d terms: ", num);
+        for (int i = 0; i < num; i++) {
+            printf("%llu ", fibonacci(i));
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
