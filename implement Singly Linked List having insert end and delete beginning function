@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the linked list
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Initialize the linked list
+struct Node* initialize() {
+    return NULL; // Initialize with an empty list (NULL)
+}
+
+// Insert a new node at the end of the linked list
+struct Node* insertAtEnd(struct Node* head, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed. Cannot insert %d.\n", value);
+        return head; // Return the unchanged list
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        return newNode; // If the list is empty, return the new node
+    }
+
+    struct Node* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    
+    current->next = newNode;
+    return head; // Return the unchanged list
+}
+
+// Delete the first node from the beginning of the linked list
+struct Node* deleteFromBeginning(struct Node* head) {
+    if (head == NULL) {
+        printf("List is empty. Cannot delete.\n");
+        return head; // Return the unchanged list
+    }
+
+    struct Node* temp = head;
+    head = head->next;
+    free(temp);
+    return head; // Return the new head of the list
+}
+
+// Display the linked list
+void display(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
+// Free the memory occupied by the linked list
+void destroy(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        struct Node* temp = current;
+        current = current->next;
+        free(temp);
+    }
+}
+
+int main() {
+    struct Node* head = initialize();
+
+    head = insertAtEnd(head, 1);
+    head = insertAtEnd(head, 2);
+    head = insertAtEnd(head, 3);
+
+    printf("Linked List: ");
+    display(head);
+
+    head = deleteFromBeginning(head);
+
+    printf("Linked List after deletion from the beginning: ");
+    display(head);
+
+    destroy(head);
+
+    return 0;
+}
