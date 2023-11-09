@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the stack
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Define a structure for the dynamic stack
+struct DynamicStack {
+    struct Node* top;
+};
+
+// Initialize the dynamic stack
+void initialize(struct DynamicStack* stack) {
+    stack->top = NULL; // Initialize the top to NULL (empty stack)
+}
+
+// Push an element onto the stack
+void push(struct DynamicStack* stack, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed. Cannot push %d.\n", value);
+        return;
+    }
+
+    newNode->data = value;
+    newNode->next = stack->top;
+    stack->top = newNode;
+}
+
+// Pop an element from the stack
+int pop(struct DynamicStack* stack) {
+    if (stack->top == NULL) {
+        printf("Stack is empty. Cannot pop.\n");
+        return -1; // Stack is empty
+    }
+
+    struct Node* temp = stack->top;
+    int poppedValue = temp->data;
+    stack->top = temp->next;
+    free(temp);
+
+    return poppedValue;
+}
+
+// Check if the stack is empty
+int isEmpty(struct DynamicStack* stack) {
+    return stack->top == NULL;
+}
+
+int main() {
+    struct DynamicStack stack;
+    initialize(&stack);
+
+    push(&stack, 1);
+    push(&stack, 2);
+    push(&stack, 3);
+
+    printf("Pop: %d\n", pop(&stack));
+    printf("Pop: %d\n", pop(&stack));
+    printf("Pop: %d\n", pop(&stack));
+
+    printf("Is stack empty? %s\n", isEmpty(&stack) ? "Yes" : "No");
+
+    return 0;
+}
