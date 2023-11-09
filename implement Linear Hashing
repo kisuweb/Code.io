@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the size of the initial hash table
+#define TABLE_SIZE 10
+
+// Structure for representing a key-value pair
+struct KeyValuePair {
+    int key;
+    int value;
+};
+
+// Structure for a hash table entry
+struct HashEntry {
+    struct KeyValuePair data;
+    struct HashEntry* next;
+};
+
+// Structure for a hash table
+struct HashTable {
+    struct HashEntry** table;
+    int size;
+    int capacity;
+};
+
+// Function to create and initialize a new hash table
+struct HashTable* createHashTable(int capacity) {
+    struct HashTable* hashTable = (struct HashTable*)malloc(sizeof(struct HashTable));
+    hashTable->table = (struct HashEntry**)malloc(sizeof(struct HashEntry*) * capacity);
+    hashTable->size = 0;
+    hashTable->capacity = capacity;
+
+    for (int i = 0; i < capacity; i++) {
+        hashTable->table[i] = NULL;
+    }
+
+    return hashTable;
+}
+
+// Function to compute the hash value
+int hash(int key, int capacity) {
+    return key % capacity;
+}
+
+// Function to insert a key-value pair into the hash table
+void insert(struct HashTable* hashTable, int key, int value) {
+    int index = hash(key, hashTable->capacity);
+    struct HashEntry* newEntry = (struct HashEntry*)malloc(sizeof(struct HashEntry));
+    newEntry->data.key = key;
+    newEntry->data.value = value;
+    newEntry->next = hashTable->table[index];
+    hashTable->table[index] = newEntry;
+    hashTable->size++;
+
+    // Check if it's time to resize the hash table
+    if (hashTable->size >= (hashTable->capacity / 2)) {
+        resize(hashTable);
+    }
+}
+
+// Function to resize the hash table and rehash the entries
+void resize(struct HashTable* hashTable) {
+    int newCapacity = 2 * hashTable->capacity;
+    struct HashEntry** newTable = (struct HashEntry**)malloc(sizeof(struct HashEntry*) * newCapacity);
+
+    for (int i = 0; i < newCapacity; i++) {
+        newTable[i] = NULL;
+    }
+
+    for (int i = 0; i < hashTable->capacity; i++) {
+        struct HashEntry* current = hashTable->table[i];
+        while (current != NULL) {
+            struct HashEntry* next = current->next;
+            int newIndex = hash(current->data.key, newCapacity);
+            current->next = newTable[newIndex];
+            newTable[newIndex] = current;
+            current = next;
+        }
+    }
+
+    free(hashTable->table);
+    hashTable->table = newTable;
+    hashTable->capacity = newCapacity;
+}
+
+// Function to search for a key and return its corresponding value
+int search(struct HashTable* hashTable, int key) {
+    int index = hash(key, hashTable->capacity);
+    struct HashEntry* current = hashTable->table[index];
+
+    while (current != NULL) {
+        if (current->data.key == key) {
+            return current->data.value;
+        }
+        current = current->next;
+    }
+
+    return -1;  // Key not found
+}
+
+// Function to display the hash table
+void displayHashTable(struct HashTable* hashTable) {
+    for (int i = 0; i < hashTable->capacity; i++) {
+        struct HashEntry* current = hashTable->table[i];
+        printf("Bucket %d: ", i);
+        while (current != NULL) {
+            printf("(%d, %d) ", current->data.key, current->data.value);
+            current = current->next;
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    struct HashTable* hashTable = createHashTable(TABLE_SIZE);
+
+    insert(hashTable, 5, 25);
+    insert(hashTable, 15, 225);
+    insert(hashTable, 25, 625);
+    insert(hashTable, 7, 49);
+    insert(hashTable, 35, 1225);
+
+    printf("Initial Hash Table:\n");
+    displayHashTable(hashTable);
+
+    printf("Search for key 15: Value = %d\n", search(hashTable, 15));
+    printf("Search for key 10: Value = %d\n", search(hashTable, 10));
+
+    free(hashTable);
+    return 0;
+}
