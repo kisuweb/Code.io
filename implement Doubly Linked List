@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the doubly linked list
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Initialize the doubly linked list
+struct Node* initialize() {
+    return NULL; // Initialize with an empty list (NULL)
+}
+
+// Insert a new node at the beginning of the doubly linked list
+struct Node* insertAtBeginning(struct Node* head, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed. Cannot insert %d.\n", value);
+        return head; // Return the unchanged list
+    }
+
+    newNode->data = value;
+    newNode->prev = NULL;
+    newNode->next = head;
+
+    if (head != NULL) {
+        head->prev = newNode;
+    }
+
+    return newNode; // Return the new head of the list
+}
+
+// Insert a new node at the end of the doubly linked list
+struct Node* insertAtEnd(struct Node* head, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed. Cannot insert %d.\n", value);
+        return head; // Return the unchanged list
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        newNode->prev = NULL;
+        return newNode; // If the list is empty, return the new node
+    }
+
+    struct Node* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    current->next = newNode;
+    newNode->prev = current;
+
+    return head; // Return the unchanged list
+}
+
+// Delete a node from the doubly linked list
+struct Node* deleteNode(struct Node* head, struct Node* nodeToDelete) {
+    if (head == NULL || nodeToDelete == NULL) {
+        return head; // Return the unchanged list
+    }
+
+    if (nodeToDelete->prev != NULL) {
+        nodeToDelete->prev->next = nodeToDelete->next;
+    } else {
+        head = nodeToDelete->next;
+    }
+
+    if (nodeToDelete->next != NULL) {
+        nodeToDelete->next->prev = nodeToDelete->prev;
+    }
+
+    free(nodeToDelete);
+    return head; // Return the updated head of the list
+}
+
+// Display the doubly linked list forward
+void displayForward(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        printf("%d <-> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
+// Display the doubly linked list backward
+void displayBackward(struct Node* head) {
+    struct Node* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    printf("NULL");
+    while (current != NULL) {
+        printf(" <-> %d", current->data);
+        current = current->prev;
+    }
+    printf("\n");
+}
+
+// Free the memory occupied by the doubly linked list
+void destroy(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        struct Node* temp = current;
+        current = current->next;
+        free(temp);
+    }
+}
+
+int main() {
+    struct Node* head = initialize();
+
+    head = insertAtEnd(head, 1);
+    head = insertAtEnd(head, 2);
+    head = insertAtEnd(head, 3);
+
+    printf("Doubly Linked List (Forward): ");
+    displayForward(head);
+
+    printf("Doubly Linked List (Backward): ");
+    displayBackward(head);
+
+    struct Node* nodeToDelete = head->next; // Delete the second node
+
+    head = deleteNode(head, nodeToDelete);
+
+    printf("Doubly Linked List after deletion (Forward): ");
+    displayForward(head);
+
+    printf("Doubly Linked List after deletion (Backward): ");
+    displayBackward(head);
+
+    destroy(head);
+
+    return 0;
+}
